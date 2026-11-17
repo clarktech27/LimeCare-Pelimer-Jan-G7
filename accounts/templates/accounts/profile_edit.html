@@ -1,0 +1,8 @@
+{% extends 'base.html' %}{% block title %}Edit Profile{% endblock %}{% block heading %}Edit Profile{% endblock %}
+{% block content %}
+<div class="panel" style="max-width:520px"><form method="post" novalidate>{% csrf_token %}
+ {% for f in user_form %}<div class="field"><label for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endfor %}
+ {% for f in profile_form %}<div class="field"><label for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endfor %}
+ <button class="btn-link" type="submit">Save Changes</button> <a class="btn-link btn-grey" href="{% url 'accounts:profile' %}">Cancel</a>
+</form></div>
+{% endblock %}

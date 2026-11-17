@@ -1,0 +1,6 @@
+{% extends 'base.html' %}{% block title %}Staff Dashboard{% endblock %}{% block heading %}Staff Dashboard{% endblock %}
+{% block content %}
+<div class="panel"><h3>Hello, {{ user.first_name|default:user.username }}!</h3>
+<p>You are signed in as <strong>Staff</strong>. Patient, appointment and other modules will appear here in later phases.</p>
+<a class="btn-link" href="{% url 'accounts:profile' %}">View My Profile</a></div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends 'auth_base.html' %}{% block title %}Login{% endblock %}
+{% block content %}
+<h2>Welcome Back</h2><p class="subtitle">Sign in to LimeCare</p>
+<form method="post" novalidate>{% csrf_token %}
+ <input type="hidden" name="next" value="{{ next }}">
+ {% for f in form %}<div class="field"><label for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}</div>{% endfor %}
+ <button class="btn-main" type="submit">Login</button>
+</form>
+<p class="alt">No account yet? <a href="{% url 'accounts:register' %}">Register here</a></p>
+{% endblock %}
