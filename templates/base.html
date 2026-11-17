@@ -1,0 +1,24 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LimeCare - {% block title %}{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
+<body><div class="layout">
+<aside class="sidebar">
+ <div class="brand"><img src="{% static 'img/logogif.gif' %}" alt="LimeCare"><h3>LimeCare</h3><p>Hospital Management</p></div>
+ <nav>
+  {% if user.profile.role == 'admin' %}
+   <a href="{% url 'accounts:admin_dashboard' %}" class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">Admin Dashboard</a>
+   <a href="{% url 'admin:index' %}">Manage Users</a>
+  {% else %}
+   <a href="{% url 'accounts:staff_dashboard' %}" class="{% if request.resolver_match.url_name == 'staff_dashboard' %}active{% endif %}">Staff Dashboard</a>
+  {% endif %}
+  <a href="{% url 'accounts:profile' %}" class="{% if 'profile' in request.resolver_match.url_name %}active{% endif %}">My Profile</a>
+  <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">Logout</button></form>
+ </nav>
+</aside>
+<main class="main-content">
+ <div class="topbar"><strong>{% block heading %}{% endblock %}</strong>
+  <span>{{ user.get_full_name|default:user.username }} <span class="pill">{{ user.profile.get_role_display }}</span></span></div>
+ {% include 'messages.html' %}
+ {% block content %}{% endblock %}
+</main></div></body></html>
