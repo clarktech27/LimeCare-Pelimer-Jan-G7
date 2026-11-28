@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from .decorators import role_required
 from .forms import ProfileUpdateForm, RegisterForm, UserUpdateForm
-from .models import Profile
+from .models import Department, Profile
 
 User = get_user_model()
 
@@ -54,17 +54,18 @@ def home(request):
 
 @role_required(Profile.ADMIN)
 def admin_dashboard(request):
-    users = User.objects.select_related('profile').order_by('-date_joined')
+    users = User.objects.select_related('profile', 'profile__department').order_by('-date_joined')
     ctx = {
         'total_users': users.count(),
         'admin_count': users.filter(profile__role=Profile.ADMIN).count(),
-        'staff_count': users.filter(profile__role=Profile.STAFF).count(),
+        'staff_count': users.exclude(profile__role=Profile.ADMIN).count(),
+        'department_count': Department.objects.filter(is_active=True).count(),
         'users': users[:10],
     }
     return render(request, 'accounts/admin_dashboard.html', ctx)
 
 
-@role_required(Profile.STAFF)
+@role_required(Profile.DOCTOR, Profile.NURSE, Profile.REGISTRATION)
 def staff_dashboard(request):
     return render(request, 'accounts/staff_dashboard.html')
 
