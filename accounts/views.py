@@ -4,10 +4,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils import timezone
+
+from clinic.models import Appointment, Patient
 
 from .decorators import role_required
 from .forms import ProfileUpdateForm, RegisterForm, UserUpdateForm
-from .models import Profile
+from .models import Department, Profile
 
 User = get_user_model()
 
@@ -54,19 +57,43 @@ def home(request):
 
 @role_required(Profile.ADMIN)
 def admin_dashboard(request):
-    users = User.objects.select_related('profile').order_by('-date_joined')
+    users = User.objects.select_related('profile', 'profile__department').order_by('-date_joined')
+    scheduled = Appointment.objects.filter(status=Appointment.SCHEDULED).select_related(
+        'patient', 'doctor__user', 'department',
+    )
     ctx = {
         'total_users': users.count(),
         'admin_count': users.filter(profile__role=Profile.ADMIN).count(),
-        'staff_count': users.filter(profile__role=Profile.STAFF).count(),
+        'staff_count': users.exclude(profile__role=Profile.ADMIN).count(),
+        'department_count': Department.objects.filter(is_active=True).count(),
         'users': users[:10],
+        'patient_count': Patient.objects.filter(is_active=True).count(),
+        'scheduled_count': scheduled.count(),
+        'today_count': scheduled.filter(scheduled_at__date=timezone.localdate()).count(),
+        'upcoming': scheduled.filter(scheduled_at__gte=timezone.now()).order_by('scheduled_at')[:5],
     }
     return render(request, 'accounts/admin_dashboard.html', ctx)
 
 
-@role_required(Profile.STAFF)
+@role_required(Profile.DOCTOR, Profile.NURSE, Profile.REGISTRATION)
 def staff_dashboard(request):
-    return render(request, 'accounts/staff_dashboard.html')
+    ctx = {}
+    role = request.user.profile.role
+    if role in (Profile.DOCTOR, Profile.REGISTRATION):
+        # Registration Staff see every Scheduled appointment; a Doctor only their own.
+        scheduled = Appointment.objects.filter(status=Appointment.SCHEDULED).select_related(
+            'patient', 'doctor__user', 'department',
+        )
+        if role == Profile.DOCTOR:
+            scheduled = scheduled.filter(doctor__user=request.user)
+        upcoming = scheduled.filter(scheduled_at__gte=timezone.now())
+        ctx = {
+            'show_appointments': True,
+            'today_count': scheduled.filter(scheduled_at__date=timezone.localdate()).count(),
+            'upcoming_count': upcoming.count(),
+            'upcoming': upcoming.order_by('scheduled_at')[:5],
+        }
+    return render(request, 'accounts/staff_dashboard.html', ctx)
 
 
 @login_required

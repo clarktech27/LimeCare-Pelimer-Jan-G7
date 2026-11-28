@@ -4,13 +4,13 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 
 
-def role_required(role):
-    """Login required AND the user must have the given role, else 403."""
+def role_required(*roles):
+    """Login required AND the user must have one of the given roles, else 403."""
     def decorator(view):
         @wraps(view)
         @login_required
         def wrapper(request, *args, **kwargs):
-            if request.user.profile.role != role:
+            if request.user.profile.role not in roles:
                 raise PermissionDenied
             return view(request, *args, **kwargs)
         return wrapper

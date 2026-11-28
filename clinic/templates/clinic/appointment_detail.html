@@ -1,0 +1,25 @@
+{% extends 'base.html' %}{% block title %}Appointment{% endblock %}{% block heading %}Appointment Details{% endblock %}
+{% block content %}
+<div class="panel">
+ <h3>{{ appointment.scheduled_at|date:"F d, Y g:i A" }} <span class="badge {{ appointment.badge_class }}">{{ appointment.status }}</span></h3>
+ <dl class="dl">
+  <dt>Patient</dt><dd><a href="{% url 'clinic:patient_detail' appointment.patient.pk %}">{{ appointment.patient.full_name }}</a> ({{ appointment.patient.patient_number }})</dd>
+  <dt>Doctor</dt><dd>Dr. {{ appointment.doctor.user.get_full_name|default:appointment.doctor.user.username }} &mdash; {{ appointment.doctor.specialization }}</dd>
+  <dt>Department</dt><dd>{{ appointment.department.name }}</dd>
+  <dt>Reason</dt><dd>{{ appointment.reason|default:"—" }}</dd>
+  <dt>Booked by</dt><dd>{{ appointment.created_by.get_full_name|default:appointment.created_by.username }} on {{ appointment.created_at|date:"M d, Y g:i A" }}</dd>
+  <dt>Last updated</dt><dd>{{ appointment.updated_at|date:"M d, Y g:i A" }}</dd>
+ </dl>
+ <div class="toolbar">
+  <a class="btn-link btn-grey" href="{% url 'clinic:appointment_list' %}">Back to list</a>
+  {% if can_act %}
+  <a class="btn-link" href="{% url 'clinic:appointment_edit' appointment.pk %}">Reschedule</a>
+  <form method="post" action="{% url 'clinic:appointment_status' appointment.pk %}">{% csrf_token %}
+   <button class="btn-link" name="action" value="complete" type="submit">Mark Completed</button>
+   <button class="btn-link btn-grey" name="action" value="no_show" type="submit">Mark No-show</button>
+   <button class="btn-link btn-danger" name="action" value="cancel" type="submit" onclick="return confirm('Cancel this appointment?')">Cancel Appointment</button>
+  </form>
+  {% endif %}
+ </div>
+</div>
+{% endblock %}

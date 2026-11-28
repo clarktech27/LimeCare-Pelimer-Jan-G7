@@ -1,6 +1,19 @@
 {% extends 'base.html' %}{% block title %}Staff Dashboard{% endblock %}{% block heading %}Staff Dashboard{% endblock %}
 {% block content %}
 <div class="panel"><h3>Hello, {{ user.first_name|default:user.username }}!</h3>
-<p>You are signed in as <strong>Staff</strong>. Patient, appointment and other modules will appear here in later phases.</p>
-<a class="btn-link" href="{% url 'accounts:profile' %}">View My Profile</a></div>
+<p>You are signed in as <strong>{{ user.profile.get_role_display }}</strong>.</p>
+<a class="btn-link" href="{% url 'clinic:patient_list' %}">Patients</a>
+{% if show_appointments %}<a class="btn-link" href="{% url 'clinic:appointment_list' %}">{% if user.profile.role == 'doctor' %}My Schedule{% else %}Appointments{% endif %}</a>{% endif %}
+<a class="btn-link btn-grey" href="{% url 'accounts:profile' %}">View My Profile</a></div>
+{% if show_appointments %}
+<div class="cards">
+ <div class="stat"><h4>Scheduled today</h4><div class="n">{{ today_count }}</div></div>
+ <div class="stat"><h4>Upcoming appointments</h4><div class="n">{{ upcoming_count }}</div></div>
+</div>
+<div class="panel"><h3>Next appointments</h3>
+<table class="t"><tr><th>Date &amp; time</th><th>Patient</th><th>Doctor</th><th>Department</th><th></th></tr>
+{% for a in upcoming %}<tr><td>{{ a.scheduled_at|date:"M d, Y g:i A" }}</td><td>{{ a.patient.full_name }}</td><td>Dr. {{ a.doctor.user.get_full_name|default:a.doctor.user.username }}</td><td>{{ a.department.name }}</td><td><a href="{% url 'clinic:appointment_detail' a.pk %}">View</a></td></tr>
+{% empty %}<tr><td colspan="5">No upcoming appointments.</td></tr>{% endfor %}
+</table></div>
+{% endif %}
 {% endblock %}

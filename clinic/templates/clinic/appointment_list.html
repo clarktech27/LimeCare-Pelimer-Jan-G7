@@ -1,0 +1,35 @@
+{% extends 'base.html' %}{% block title %}Appointments{% endblock %}{% block heading %}{% if user.profile.role == 'doctor' %}My Schedule{% else %}Appointments{% endif %}{% endblock %}
+{% block content %}
+<div class="panel">
+ <form method="get" class="toolbar">
+  <input class="grow" type="text" name="q" value="{{ q }}" placeholder="Search by patient name or number">
+  <input type="date" name="date" value="{{ date }}" title="Filter by date">
+  <select name="status">
+   {% for value, label in status_choices %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+   <option value="all" {% if status == 'all' %}selected{% endif %}>All</option>
+  </select>
+  <button class="btn-link" type="submit">Filter</button>
+  {% if can_book %}<a class="btn-link" href="{% url 'clinic:appointment_create' %}">+ Book Appointment</a>{% endif %}
+ </form>
+ <table class="t">
+  <tr><th>Date &amp; time</th><th>Patient</th><th>Doctor</th><th>Department</th><th>Status</th><th></th></tr>
+  {% for a in page %}
+  <tr>
+   <td>{{ a.scheduled_at|date:"M d, Y g:i A" }}</td>
+   <td>{{ a.patient.full_name }}<br><small>{{ a.patient.patient_number }}</small></td>
+   <td>Dr. {{ a.doctor.user.get_full_name|default:a.doctor.user.username }}</td>
+   <td>{{ a.department.name }}</td>
+   <td><span class="badge {{ a.badge_class }}">{{ a.status }}</span></td>
+   <td><a href="{% url 'clinic:appointment_detail' a.pk %}">View</a></td>
+  </tr>
+  {% empty %}<tr><td colspan="6">No appointments found.</td></tr>{% endfor %}
+ </table>
+ {% if page.paginator.num_pages > 1 %}
+ <div class="pager">
+  {% if page.has_previous %}<a href="?{{ query }}&page={{ page.previous_page_number }}">&laquo; Previous</a>{% endif %}
+  <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a href="?{{ query }}&page={{ page.next_page_number }}">Next &raquo;</a>{% endif %}
+ </div>
+ {% endif %}
+</div>
+{% endblock %}
