@@ -4,7 +4,16 @@
  <div class="stat"><h4>Total Users</h4><div class="n">{{ total_users }}</div></div>
  <div class="stat"><h4>Admins</h4><div class="n">{{ admin_count }}</div></div>
  <div class="stat"><h4>Staff</h4><div class="n">{{ staff_count }}</div></div>
+ <div class="stat"><h4>Departments</h4><div class="n">{{ department_count }}</div></div>
+ <div class="stat"><h4>Active Patients</h4><div class="n">{{ patient_count }}</div></div>
+ <div class="stat"><h4>Scheduled Appointments</h4><div class="n">{{ scheduled_count }}</div></div>
+ <div class="stat"><h4>Scheduled Today</h4><div class="n">{{ today_count }}</div></div>
 </div>
+<div class="panel"><h3>Next Appointments</h3>
+<table class="t"><tr><th>Date &amp; time</th><th>Patient</th><th>Doctor</th><th>Department</th><th></th></tr>
+{% for a in upcoming %}<tr><td>{{ a.scheduled_at|date:"M d, Y g:i A" }}</td><td>{{ a.patient.full_name }}</td><td>Dr. {{ a.doctor.user.get_full_name|default:a.doctor.user.username }}</td><td>{{ a.department.name }}</td><td><a href="{% url 'clinic:appointment_detail' a.pk %}">View</a></td></tr>
+{% empty %}<tr><td colspan="5">No upcoming appointments.</td></tr>{% endfor %}
+</table></div>
 <div class="panel"><h3>Recent Users</h3>
 <table class="t"><tr><th>Username</th><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr>
 {% for u in users %}<tr><td>{{ u.username }}</td><td>{{ u.get_full_name }}</td><td>{{ u.email }}</td><td>{{ u.profile.get_role_display }}</td><td>{{ u.date_joined|date:"M d, Y" }}</td></tr>{% endfor %}
