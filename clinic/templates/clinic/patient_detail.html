@@ -14,6 +14,7 @@
  </dl>
  <div class="toolbar">
   <a class="btn-link btn-grey" href="{% url 'clinic:patient_list' %}">Back to list</a>
+  {% if can_book %}<a class="btn-link" href="{% url 'clinic:appointment_create' %}?patient={{ patient.pk }}">Book Appointment</a>{% endif %}
   {% if can_manage %}
   <a class="btn-link" href="{% url 'clinic:patient_edit' patient.pk %}">Edit</a>
   <form method="post" action="{% url 'clinic:patient_toggle_active' patient.pk %}">{% csrf_token %}

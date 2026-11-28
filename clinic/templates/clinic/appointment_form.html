@@ -1,0 +1,29 @@
+{% extends 'base.html' %}{% block title %}{{ title }}{% endblock %}{% block heading %}{{ title }}{% endblock %}
+{% block content %}
+<div class="panel" style="max-width:760px"><form method="post" novalidate>{% csrf_token %}
+ {% if form.non_field_errors %}<div class="msg msg-danger">{{ form.non_field_errors }}</div>{% endif %}
+ <div class="form-grid">
+ {% for f in form %}<div class="field"><label for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endfor %}
+ </div>
+ <button class="btn-link" type="submit">Save</button>
+ <a class="btn-link btn-grey" href="{% if appointment %}{% url 'clinic:appointment_detail' appointment.pk %}{% else %}{% url 'clinic:appointment_list' %}{% endif %}">Cancel</a>
+</form></div>
+<script>
+// Show only the doctors that belong to the chosen department (BR-15 is still checked on the server).
+(function () {
+  var dept = document.getElementById('id_department'), doc = document.getElementById('id_doctor');
+  if (!dept || !doc) return;
+  function filterDoctors() {
+    for (var i = 0; i < doc.options.length; i++) {
+      var o = doc.options[i];
+      if (!o.value) continue;
+      var show = !dept.value || o.getAttribute('data-department') === dept.value;
+      o.hidden = !show; o.disabled = !show;
+    }
+    if (doc.selectedIndex >= 0 && doc.options[doc.selectedIndex].disabled) doc.value = '';
+  }
+  dept.addEventListener('change', filterDoctors);
+  filterDoctors();
+})();
+</script>
+{% endblock %}
