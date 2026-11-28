@@ -1,0 +1,32 @@
+{% extends 'base.html' %}{% block title %}Patients{% endblock %}{% block heading %}Patients{% endblock %}
+{% block content %}
+<div class="panel">
+ <form method="get" class="toolbar">
+  <input class="grow" type="text" name="q" value="{{ q }}" placeholder="Search by name or patient number">
+  <select name="status">
+   <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+   <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
+   <option value="all" {% if status == 'all' %}selected{% endif %}>All</option>
+  </select>
+  <button class="btn-link" type="submit">Search</button>
+  {% if can_manage %}<a class="btn-link" href="{% url 'clinic:patient_create' %}">+ Register Patient</a>{% endif %}
+ </form>
+ <table class="t">
+  <tr><th>Patient No.</th><th>Name</th><th>Age</th><th>Sex</th><th>Contact</th><th>Status</th><th></th></tr>
+  {% for p in page %}
+  <tr>
+   <td>{{ p.patient_number }}</td><td>{{ p.full_name }}</td><td>{{ p.age }}</td><td>{{ p.sex }}</td><td>{{ p.contact_number }}</td>
+   <td>{% if p.is_active %}<span class="badge badge-green">Active</span>{% else %}<span class="badge badge-grey">Inactive</span>{% endif %}</td>
+   <td><a href="{% url 'clinic:patient_detail' p.pk %}">View</a></td>
+  </tr>
+  {% empty %}<tr><td colspan="7">No patients found.</td></tr>{% endfor %}
+ </table>
+ {% if page.paginator.num_pages > 1 %}
+ <div class="pager">
+  {% if page.has_previous %}<a href="?{{ query }}&page={{ page.previous_page_number }}">&laquo; Previous</a>{% endif %}
+  <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a href="?{{ query }}&page={{ page.next_page_number }}">Next &raquo;</a>{% endif %}
+ </div>
+ {% endif %}
+</div>
+{% endblock %}

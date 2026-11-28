@@ -12,8 +12,9 @@
   {% else %}
    <a href="{% url 'accounts:staff_dashboard' %}" class="{% if request.resolver_match.url_name == 'staff_dashboard' %}active{% endif %}">Staff Dashboard</a>
   {% endif %}
-  <a href="{% url 'accounts:profile' %}" class="{% if 'profile' in request.resolver_match.url_name %}active{% endif %}">My Profile</a>
-  <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">Logout</button></form>
+   <a href="{% url 'clinic:patient_list' %}" class="{% if request.resolver_match.app_name == 'clinic' %}active{% endif %}">Patients</a>
+   <a href="{% url 'accounts:profile' %}" class="{% if 'profile' in request.resolver_match.url_name %}active{% endif %}">My Profile</a>
+   <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">Logout</button></form>
  </nav>
 </aside>
 <main class="main-content">
