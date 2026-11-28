@@ -15,7 +15,7 @@ class RegistrationTests(TestCase):
         u = User.objects.get(username='ana')
         self.assertTrue(u.password.startswith('pbkdf2_'))
         self.assertNotEqual(u.password, GOOD['password1'])
-        self.assertEqual(u.profile.role, Profile.STAFF)
+        self.assertEqual(u.profile.role, Profile.REGISTRATION)
         self.assertContains(r, 'Account created successfully')
         self.assertEqual(r.redirect_chain[-1][0], reverse('accounts:staff_dashboard'))
 
@@ -39,7 +39,7 @@ class AuthAndRoleTests(TestCase):
         self.admin = User.objects.create_superuser('a', 'a@x.com', 'pw12345!x')
 
     def test_profiles_and_roles(self):
-        self.assertEqual(self.staff.profile.role, 'staff')
+        self.assertEqual(self.staff.profile.role, 'registration')
         self.assertEqual(self.admin.profile.role, 'admin')
 
     def test_invalid_login_message(self):
