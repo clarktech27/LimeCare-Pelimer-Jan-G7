@@ -1,0 +1,26 @@
+{% extends 'base.html' %}{% block title %}{{ patient.full_name }}{% endblock %}{% block heading %}Patient Record{% endblock %}
+{% block content %}
+<div class="panel">
+ <h3>{{ patient.full_name }} {% if patient.is_active %}<span class="badge badge-green">Active</span>{% else %}<span class="badge badge-grey">Inactive</span>{% endif %}</h3>
+ <dl class="dl">
+  <dt>Patient number</dt><dd>{{ patient.patient_number }}</dd>
+  <dt>Birth date</dt><dd>{{ patient.birth_date|date:"F d, Y" }} ({{ patient.age }} years old)</dd>
+  <dt>Sex</dt><dd>{{ patient.sex }}</dd>
+  <dt>Contact number</dt><dd>{{ patient.contact_number }}</dd>
+  <dt>Email</dt><dd>{{ patient.email|default:"—" }}</dd>
+  <dt>Address</dt><dd>{{ patient.address }}</dd>
+  <dt>Emergency contact</dt><dd>{{ patient.emergency_contact_name|default:"—" }}{% if patient.emergency_contact_number %} ({{ patient.emergency_contact_number }}){% endif %}</dd>
+  <dt>Registered by</dt><dd>{{ patient.registered_by.get_full_name|default:patient.registered_by.username }} on {{ patient.created_at|date:"M d, Y" }}</dd>
+ </dl>
+ <div class="toolbar">
+  <a class="btn-link btn-grey" href="{% url 'clinic:patient_list' %}">Back to list</a>
+  {% if can_manage %}
+  <a class="btn-link" href="{% url 'clinic:patient_edit' patient.pk %}">Edit</a>
+  <form method="post" action="{% url 'clinic:patient_toggle_active' patient.pk %}">{% csrf_token %}
+   {% if patient.is_active %}<button class="btn-link btn-danger" type="submit" onclick="return confirm('Deactivate this patient? They will no longer be able to receive appointments.')">Deactivate</button>
+   {% else %}<button class="btn-link" type="submit">Reactivate</button>{% endif %}
+  </form>
+  {% endif %}
+ </div>
+</div>
+{% endblock %}

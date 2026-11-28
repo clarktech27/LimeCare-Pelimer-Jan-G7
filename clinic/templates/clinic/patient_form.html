@@ -1,0 +1,11 @@
+{% extends 'base.html' %}{% block title %}{{ title }}{% endblock %}{% block heading %}{{ title }}{% endblock %}
+{% block content %}
+<div class="panel" style="max-width:760px"><form method="post" novalidate>{% csrf_token %}
+ {% if form.non_field_errors %}<div class="msg msg-danger">{{ form.non_field_errors }}</div>{% endif %}
+ <div class="form-grid">
+ {% for f in form %}<div class="field"><label for="{{ f.id_for_label }}">{{ f.label }}</label>{{ f }}{{ f.errors }}</div>{% endfor %}
+ </div>
+ <button class="btn-link" type="submit">Save</button>
+ <a class="btn-link btn-grey" href="{% if patient %}{% url 'clinic:patient_detail' patient.pk %}{% else %}{% url 'clinic:patient_list' %}{% endif %}">Cancel</a>
+</form></div>
+{% endblock %}
